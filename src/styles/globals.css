@@ -1,0 +1,274 @@
+@import "tailwindcss";
+@import "lenis/dist/lenis.css";
+
+/* ------------------------------------------------------------------
+   Blue Book Press — design tokens
+   White paper, black ink, blue accents only. Editorial & premium.
+   ------------------------------------------------------------------ */
+@theme {
+  /* Surfaces & ink */
+  --color-paper: #ffffff;
+  --color-ivory: #f8f8f5;
+  --color-mist: #eef1f0;
+  --color-line: #e3e5e3;
+  --color-ink: #0b0b0c;
+  --color-ink-soft: #3a3b3e;
+  --color-ink-muted: #75777c;
+
+  /* Blue accent */
+  --color-blue-soft: #e8eefe;
+  --color-blue: #1f4fe0;
+  --color-blue-deep: #0f2a8a;
+  --color-blue-light: #7d9bff;
+
+  /* Typography (CSS vars come from next/font in src/lib/fonts.ts) */
+  --font-serif: var(--font-heading), "Times New Roman", Times, serif;
+  --font-display: var(--font-display-face), "Arial Narrow", Impact, sans-serif;
+  --font-sans: var(--font-body), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /* Editorial fluid type scale */
+  --text-display: clamp(3.5rem, 9vw, 9.5rem);
+  --text-display--line-height: 0.92;
+  --text-display--letter-spacing: -0.035em;
+  --text-headline: clamp(2.5rem, 5.5vw, 5.5rem);
+  --text-headline--line-height: 1;
+  --text-headline--letter-spacing: -0.025em;
+  --text-title: clamp(1.75rem, 3vw, 2.75rem);
+  --text-title--line-height: 1.1;
+  --text-title--letter-spacing: -0.015em;
+  --text-lead: clamp(1.125rem, 1.4vw, 1.375rem);
+  --text-lead--line-height: 1.55;
+
+  /* Motion */
+  --ease-cinematic: cubic-bezier(0.76, 0, 0.24, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Layout */
+  --spacing-gutter: clamp(1rem, 4vw, 3rem);
+  --spacing-section: clamp(6rem, 14vw, 12rem);
+  --container-site: 90rem;
+
+  /* Animations */
+  --animate-marquee: marquee 38s linear infinite;
+  --animate-marquee-slow: marquee 70s linear infinite;
+  --animate-scroll-cue: scroll-cue 2.2s cubic-bezier(0.76, 0, 0.24, 1) infinite;
+  --animate-eq: eq 0.9s ease-in-out infinite;
+  --animate-fade-up: fade-up 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+
+  @keyframes marquee {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+  }
+  @keyframes eq {
+    0%,
+    100% {
+      transform: scaleY(0.35);
+    }
+    50% {
+      transform: scaleY(1);
+    }
+  }
+  @keyframes scroll-cue {
+    0% {
+      transform: translateY(-100%);
+    }
+    100% {
+      transform: translateY(200%);
+    }
+  }
+
+  /* Header height, shared by layout + 3D scene offsets */
+  --spacing-header: 5rem;
+}
+
+@layer base {
+  html {
+    background: var(--color-paper);
+    color: var(--color-ink);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    min-height: 100dvh;
+    /* No body background: lets the fixed 3D stage sit at z-index -1 behind content. */
+    overflow-x: clip;
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-serif);
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background: var(--color-blue);
+    color: var(--color-paper);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-blue);
+    outline-offset: 3px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+/* Reusable editorial utilities */
+@utility container-site {
+  width: 100%;
+  max-width: var(--container-site);
+  margin-inline: auto;
+  padding-inline: var(--spacing-gutter);
+}
+
+@utility eyebrow {
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+@utility serif-italic {
+  font-family: var(--font-serif);
+  font-style: italic;
+}
+
+@utility text-gradient-brand {
+  background-image: linear-gradient(100deg, var(--color-blue-deep) 0%, var(--color-blue) 55%, var(--color-blue-light) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  /* italic glyphs overhang their box — avoid clipping */
+  padding-right: 0.08em;
+  margin-right: -0.08em;
+}
+
+/* High-contrast variant for large headline words: deep navy → royal blue. */
+@utility text-gradient-ink-blue {
+  background-image: linear-gradient(100deg, var(--color-blue-deep) 0%, var(--color-blue) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  padding-right: 0.08em;
+  margin-right: -0.08em;
+}
+
+/* 1px blue gradient border on rounded panels */
+@utility gradient-border {
+  position: relative;
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    padding: 1px;
+    border-radius: inherit;
+    background: linear-gradient(135deg, color-mix(in oklab, var(--color-blue) 55%, transparent), var(--color-line) 45%, color-mix(in oklab, var(--color-blue-light) 55%, transparent));
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+}
+
+/* Fixed 3D stage: in front of the content or behind it, per section. */
+.stage-layer {
+  z-index: 30;
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.stage-layer[data-dim="true"] {
+  opacity: 0.14;
+}
+.stage-layer[data-layer="back"] {
+  z-index: -1;
+}
+
+/* Immersive pages (About): keep scroll, hide the scrollbar. */
+html.no-scrollbar {
+  scrollbar-width: none;
+}
+html.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* ------------------------------------------------------------------
+   Publishing Suite — solid-blue page
+   ------------------------------------------------------------------ */
+/* Text colour is set on the page wrapper, not here, so the (white) menu
+   overlay keeps its dark ink. */
+html.suite-page {
+  background: var(--color-blue);
+}
+html.suite-page ::selection {
+  background: var(--color-paper);
+  color: var(--color-blue-deep);
+}
+html.suite-page :focus-visible {
+  outline-color: var(--color-paper);
+}
+
+/* Image-filled display type (texture from /public/service-design). Set the
+   image with `--tex`; scroll moves `--tex-y` for parallax inside letters. */
+@utility text-texture {
+  background-image: var(--tex);
+  background-size: cover;
+  background-position: 50% var(--tex-y, 50%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-stroke: 1px rgb(255 255 255 / 0.55);
+}
+
+/* Hollow display type with a hairline white stroke. */
+@utility text-outline {
+  color: transparent;
+  -webkit-text-stroke: 1.5px rgb(255 255 255 / 0.9);
+}
+
+/* Display face: tall condensed caps. */
+@utility display-caps {
+  font-family: var(--font-display);
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: -0.005em;
+  line-height: 0.86;
+}
+
+/* ------------------------------------------------------------------
+   Portfolio — black page after the white intro
+   ------------------------------------------------------------------ */
+html.portfolio-page {
+  /* Pure black, matching the page's remapped ink. */
+  background: #000;
+}
+html.portfolio-page ::selection {
+  background: var(--color-blue);
+  color: var(--color-paper);
+}
